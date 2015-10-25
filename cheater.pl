@@ -22,17 +22,6 @@ while(<>) {
 			push(@{$currows}, $currow);
 			$currow = [];
 		}
-	} elsif(/^\|(.*(?:\|\|.*)+)$/) {
-		debug "Found single-row row\n";
-		#@{$currow} = split('||', $1);
-	} elsif(/^\!(?:.*\|)?(.*)$/) {
-		# Header col
-		debug "Found header col\n";
-		push(@{$curheader}, $1);
-	} elsif(/^\|(?:.*\|)?(.*)$/) {
-		# Regular col
-		debug "Found regular col\n";
-		push(@{$currow}, $1);
 	} elsif(/^\|\}/) {
 		# End of a table
 		debug "Finishing table!\n";
@@ -42,6 +31,13 @@ while(<>) {
 		};
 		$currows = [];
 		$curheader = [];
+	} elsif(/^\|(.*(?:\|\|.*)+)$/) {
+		debug "Found single-row row\n";
+		#@{$currow} = split('||', $1);
+	} elsif(/^[\|\!](?:.*\|)?(.*)$/) {
+		# Regular col
+		debug "Found individual col\n";
+		push(@{$currow}, $1);
 	}
 }
 
