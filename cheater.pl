@@ -4,28 +4,38 @@ my $currow;
 my $currows;
 my %tables;
 my $curtitle;
+
+sub debug {
+	if(0) {
+		print @_;
+	}
+}
+
 while(<>) {
 	if(/title>(.*)<\/title/) {
 		$curtitle = $1;
-		#print "Found title: $curtitle\n";
+		debug "Found title: $curtitle\n";
 	} elsif(/^\|\-/) {
 		# End of a row
 		if(scalar(@{$currow}) > 0) {
-			#print "Finishing row!\n";
+			debug "Finishing row!\n";
 			push(@{$currows}, $currow);
 			$currow = [];
 		}
-	} elsif(/^\!.*\|(.*)$/) {
+	} elsif(/^\|(.*(?:\|\|.*)+)$/) {
+		debug "Found single-row row\n";
+		#@{$currow} = split('||', $1);
+	} elsif(/^\!(?:.*\|)?(.*)$/) {
 		# Header col
-		#print "Found header col\n";
+		debug "Found header col\n";
 		push(@{$curheader}, $1);
-	} elsif(/^\|.*\|(.*)$/) {
+	} elsif(/^\|(?:.*\|)?(.*)$/) {
 		# Regular col
-		#print "Found regular col\n";
+		debug "Found regular col\n";
 		push(@{$currow}, $1);
 	} elsif(/^\|\}/) {
 		# End of a table
-		#print "Finishing table!\n";
+		debug "Finishing table!\n";
 		$tables{$curtitle} = {
 			header => $curheader,
 			rows => $currows
