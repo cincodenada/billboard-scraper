@@ -1,8 +1,9 @@
 use Data::Dumper;
+use HTML::Entities;
 my $curheader;
 my $currow;
 my $currows;
-my %tables;
+my %rows;
 my $curtitle;
 
 sub debug {
@@ -25,10 +26,7 @@ while(<>) {
 	} elsif(/^\|\}/) {
 		# End of a table
 		debug "Finishing table!\n";
-		$tables{$curtitle} = {
-			header => $curheader,
-			rows => $currows
-		};
+		$rows{$curtitle} = $currows;
 		$currows = [];
 		$curheader = [];
 	} elsif(/^\|(.*(?:\|\|.*)+)$/) {
@@ -41,4 +39,14 @@ while(<>) {
 	}
 }
 
-print Dumper %tables;
+for $chart (keys %rows) {
+	print "$chart\n";
+	$first_row = shift(@{$rows{$chart}});
+	print join("\t",@{$first_row}) . "\n";
+	for $row (@{$rows{$chart}}) {
+		@currow = map {s/([\[\]])//g; $_} @{$row};
+		@currow = map {decode_entities($_)} @currow;
+		print join("\t",@currow) . "\n";
+	}
+}
+print Dumper %rows;
