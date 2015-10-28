@@ -24,6 +24,10 @@ while(<>) {
 	s/\[\[(.*?)\]\]/\1/g;
 	s/\|\|[^\[\|]+?\|([^\|])/\|\|\1/g;
 
+	if(/^{\|/) {
+		$in_table = 1;
+	}
+
 	if(/title>(.*)<\/title/) {
 		$curtitle = $1;
 		debug "Found title: $curtitle\n";
@@ -45,13 +49,14 @@ while(<>) {
 	} elsif(/^\|\}/) {
 		# End of a table
 		debug "Finishing table!\n";
+		$in_table = 0;
 		$rows{$curtitle} = $currows;
 		$currows = [];
 		$curheader = [];
-	} elsif(/^\|(.*(?:\|\|.*)+)$/) {
+	} elsif($in_table and /^\|(.*(?:\|\|.*)+)$/) {
 		debug "Found single-row row\n";
 		@{$currow} = split(/\|\|/, $1);
-	} elsif(/^[\|\!](?:.*\|)?(.*)$/) {
+	} elsif($in_table and /^[\|\!](?:.*\|)?(.*)$/) {
 		# Regular col
 		debug "Found individual col\n";
 		push(@{$currow}, $1);
