@@ -21,6 +21,7 @@ while(<>) {
 	s/\{\{.*?\}\}//g;
 	s/\[\[(.*?)\|(.*?)\]\]/\2/g;
 	s/\[\[(.*?)\]\]/\1/g;
+	s/\|\|[^\[]+\|([^\|])/\|\|\1/g;
 
 	if(/title>(.*)<\/title/) {
 		$curtitle = $1;
@@ -30,6 +31,7 @@ while(<>) {
 		$filteredrow = [];
 		foreach $val (@{$currow}) {
 			$val =~ s/^\s+|\s+$//g;
+			$val =~ s/^"(.*)"$/\1/g;
 			if($val ne '') {
 				push(@{$filteredrow}, $val);
 			}
@@ -47,7 +49,7 @@ while(<>) {
 		$curheader = [];
 	} elsif(/^\|(.*(?:\|\|.*)+)$/) {
 		debug "Found single-row row\n";
-		@{$currow} = split('||', $1);
+		@{$currow} = split(/\|\|/, $1);
 	} elsif(/^[\|\!](?:.*\|)?(.*)$/) {
 		# Regular col
 		debug "Found individual col\n";
