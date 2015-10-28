@@ -37,6 +37,7 @@ while(<>) {
 		foreach $val (@{$currow}) {
 			$val =~ s/^\s+|\s+$//g;
 			$val =~ s/^"(.*)"$/\1/g;
+			$val =~ s/^'+(.*)'+$/\1/g;
 			if($val ne '') {
 				push(@{$filteredrow}, $val);
 			}
@@ -51,6 +52,7 @@ while(<>) {
 		debug "Finishing table!\n";
 		$in_table = 0;
 		$rows{$curtitle} = $currows;
+		$currow = [];
 		$currows = [];
 		$curheader = [];
 	} elsif($in_table and /^\|(.*(?:\|\|.*)+)$/) {
