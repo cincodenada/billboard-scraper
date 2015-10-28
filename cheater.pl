@@ -13,6 +13,10 @@ sub debug {
 }
 
 while(<>) {
+	$_ = decode_entities($_);
+	s/<ref>[^<]+<\/ref>//g;
+	s/\{\{[^\}]+\}\}//g;
+
 	if(/title>(.*)<\/title/) {
 		$curtitle = $1;
 		debug "Found title: $curtitle\n";
@@ -45,7 +49,6 @@ for $chart (keys %rows) {
 	print join("\t",@{$first_row}) . "\n";
 	for $row (@{$rows{$chart}}) {
 		@currow = map {s/([\[\]])//g; $_} @{$row};
-		@currow = map {decode_entities($_)} @currow;
 		print join("\t",@currow) . "\n";
 	}
 }
