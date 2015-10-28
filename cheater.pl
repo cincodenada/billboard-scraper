@@ -18,7 +18,7 @@ while(<>) {
 	s/<small>(.*?)<\/small>/(\1)/g;
 	s/<ref.*?\/>//g;
 	s/<!--.*?-->//g;
-	s/<\/?br ?\/?>//g;
+	s/<\/?br ?\/?>/ /g;
 	s/\{\{.*?\}\}//g;
 	s/\[\[([^\]]*?)\|([^\]]*?)\]\]/\2/g;
 	s/\[\[(.*?)\]\]/\1/g;
@@ -65,7 +65,8 @@ while(<>) {
 	}
 }
 
-%seen = {};
+%persong = {};
+%songdata = {};
 for $key (keys %rows) {
 	$chart = $key;
 	$chart =~ s/^List of //i;
@@ -78,11 +79,18 @@ for $key (keys %rows) {
 			$date = shift(@{$row});
 			$song = shift(@{$row});
 			$artist = shift(@{$row});
-			unless($seen{$artist.$song}) {
-				printf("%s - %s (%s, %s %s)\n", $artist, $song, $chart, $date, $year);
-				$seen{$artist.$song} = 1;
+			$songdata{$artist.$song} = ($song, $artist);
+			unless($persong{$artist.$song}) {
+				$persong{$artist.$song} = [];
 			}
+			push(@{$persong{$artist.$song}}, printf("%s, %s %s", $chart, $date, $year));
 		}
 	}
+}
+print Dumper %persong;
+
+for $key (keys %persong) {
+	my ($song, $artist) = $songdata{$key};
+	printf("%s - %s (%s)\n", $song, $artist, join('; ', @{$persong{$key}}));
 }
 #print Dumper %rows;
