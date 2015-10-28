@@ -16,6 +16,7 @@ while(<>) {
 	$_ = decode_entities($_);
 	s/<ref.*?>.*?<\/ref>//g;
 	s/<ref.*?\/>//g;
+	s/<!--.*?-->//g;
 	s/<\/?br ?\/?>//g;
 	s/\{\{.*?\}\}//g;
 	s/\[\[(.*?)\|(.*?)\]\]/\2/g;
@@ -26,9 +27,16 @@ while(<>) {
 		debug "Found title: $curtitle\n";
 	} elsif(/^\|\-/) {
 		# End of a row
-		if(scalar(@{$currow}) > 0) {
+		$filteredrow = [];
+		foreach $val (@{$currow}) {
+			$val =~ s/^\s+|\s+$//g;
+			if($val ne '') {
+				push(@{$filteredrow}, $val);
+			}
+		}
+		if(scalar(@{$filteredrow}) > 0) {
 			debug "Finishing row!\n";
-			push(@{$currows}, $currow);
+			push(@{$currows}, $filteredrow);
 			$currow = [];
 		}
 	} elsif(/^\|\}/) {
@@ -39,7 +47,7 @@ while(<>) {
 		$curheader = [];
 	} elsif(/^\|(.*(?:\|\|.*)+)$/) {
 		debug "Found single-row row\n";
-		#@{$currow} = split('||', $1);
+		@{$currow} = split('||', $1);
 	} elsif(/^[\|\!](?:.*\|)?(.*)$/) {
 		# Regular col
 		debug "Found individual col\n";
@@ -52,8 +60,9 @@ for $chart (keys %rows) {
 	$first_row = shift(@{$rows{$chart}});
 	print join("\t",@{$first_row}) . "\n";
 	for $row (@{$rows{$chart}}) {
-		@currow = map {s/([\[\]])//g; $_} @{$row};
-		print join("\t",@currow) . "\n";
+		if(scalar(@{$row}) > 2) {
+			print join("\t",@{$row}) . "\n";
+		}
 	}
 }
-print Dumper %rows;
+#print Dumper %rows;
