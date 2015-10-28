@@ -76,21 +76,19 @@ for $key (keys %rows) {
 	}
 	for $row (@{$rows{$key}}) {
 		if(scalar(@{$row}) > 2) {
-			$date = shift(@{$row});
-			$song = shift(@{$row});
-			$artist = shift(@{$row});
-			$songdata{$artist.$song} = ($song, $artist);
+			print join("\t", @{$row}) . "\n";
+			my ($date, $song, $artist) = @{$row};
+			$songdata{$artist.$song} = [$song, $artist];
 			unless($persong{$artist.$song}) {
 				$persong{$artist.$song} = [];
 			}
-			push(@{$persong{$artist.$song}}, printf("%s, %s %s", $chart, $date, $year));
+			push(@{$persong{$artist.$song}}, sprintf("%s, %s %s", $chart, $date, $year));
 		}
 	}
 }
-print Dumper %persong;
 
 for $key (keys %persong) {
-	my ($song, $artist) = $songdata{$key};
+	my ($song, $artist) = @{$songdata{$key}};
 	printf("%s - %s (%s)\n", $song, $artist, join('; ', @{$persong{$key}}));
 }
 #print Dumper %rows;
