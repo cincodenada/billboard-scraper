@@ -65,13 +65,23 @@ while(<>) {
 	}
 }
 
-for $chart (keys %rows) {
-	print "$chart\n";
-	$first_row = shift(@{$rows{$chart}});
-	print join("\t",@{$first_row}) . "\n";
-	for $row (@{$rows{$chart}}) {
+%seen = {};
+for $key (keys %rows) {
+	$chart = $key;
+	$chart =~ s/^List of //i;
+	$chart =~ s/^Number[ \-]one //i;
+	if($chart =~ /of (\d+)/) {
+		$year = $1;
+	}
+	for $row (@{$rows{$key}}) {
 		if(scalar(@{$row}) > 2) {
-			print join("\t",@{$row}) . "\n";
+			$date = shift(@{$row});
+			$song = shift(@{$row});
+			$artist = shift(@{$row});
+			unless($seen{$artist.$song}) {
+				printf("%s - %s (%s, %s %s)\n", $artist, $song, $chart, $date, $year);
+				$seen{$artist.$song} = 1;
+			}
 		}
 	}
 }
