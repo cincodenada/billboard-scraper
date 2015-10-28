@@ -24,6 +24,9 @@ while(<>) {
 	s/\[\[(.*?)\]\]/\1/g;
 	s/\|\|[^\[\|]+?\|([^\|])/\|\|\1/g;
 
+	# Skip title rows, we don't care
+	if(/^\|\+/) { next; }
+
 	if(/^{\|/) {
 		$in_table = 1;
 	}
@@ -55,9 +58,9 @@ while(<>) {
 		$currow = [];
 		$currows = [];
 		$curheader = [];
-	} elsif($in_table and /^\|(.*(?:\|\|.*)+)$/) {
+	} elsif($in_table and /^[\|\!](.*(?:[\|\!]{2,2}.*)+)$/) {
 		debug "Found single-row row\n";
-		@{$currow} = split(/\|\|/, $1);
+		@{$currow} = split(/[\|\!]{2,2}/, $1);
 	} elsif($in_table and /^[\|\!](?:.*\|)?(.*)$/) {
 		# Regular col
 		debug "Found individual col\n";
@@ -67,6 +70,7 @@ while(<>) {
 
 %persong = {};
 %songdata = {};
+%headers = {};
 for $key (keys %rows) {
 	$chart = $key;
 	$chart =~ s/^List of //i;
@@ -74,9 +78,13 @@ for $key (keys %rows) {
 	if($chart =~ /of (\d+)/) {
 		$year = $1;
 	}
+
+	@header = @{shift(@{$rows{$key}})};
+	$firstheaders{lc(join('|',@header))}++;
+	$first_is_date = ($header[0] =~ /date/i);
+	$mincols = $first_is_date ? 3 : 2;
 	for $row (@{$rows{$key}}) {
-		if(scalar(@{$row}) > 2) {
-			print join("\t", @{$row}) . "\n";
+		if(scalar(@{$row}) >= $mincols) {
 			my ($date, $song, $artist) = @{$row};
 			$songdata{$artist.$song} = [$song, $artist];
 			unless($persong{$artist.$song}) {
@@ -86,6 +94,8 @@ for $key (keys %rows) {
 		}
 	}
 }
+
+print Dumper %firstheaders;
 
 for $key (keys %persong) {
 	my ($song, $artist) = @{$songdata{$key}};
