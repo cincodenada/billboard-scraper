@@ -80,22 +80,42 @@ for $key (keys %rows) {
 	}
 
 	@header = @{shift(@{$rows{$key}})};
-	$firstheaders{lc(join('|',@header))}++;
-	$first_is_date = ($header[0] =~ /date/i);
-	$mincols = $first_is_date ? 3 : 2;
-	for $row (@{$rows{$key}}) {
-		if(scalar(@{$row}) >= $mincols) {
-			my ($date, $song, $artist) = @{$row};
-			$songdata{$artist.$song} = [$song, $artist];
-			unless($persong{$artist.$song}) {
-				$persong{$artist.$song} = [];
+
+	# Determine columns
+	%colpos = ();
+	$colnum = 0;
+	$mincols = 0;
+	for $col (@header) {
+		if($col =~ /date|reached/i) {
+			$colpos{date} = $colnum;
+			if($colnum > $mincols) { $mincols = $colnum; }
+		} elsif($col =~ /song|title|single/i) {
+			$colpos{song} = $colnum;
+			if($colnum > $mincols) { $mincols = $colnum; }
+		} elsif($col =~ /artist/i) {
+			$colpos{artist} = $colnum;
+			if($colnum > $mincols) { $mincols = $colnum; }
+		}
+		$colnum++;
+	}
+
+	if(exists($colpos{artist}) and exists($colpos{song})) {
+		for $row (@{$rows{$key}}) {
+			@currow = @{$row};
+			if(scalar(@currow) > $mincols) {
+				$song = $currow[$colpos{song}];
+				$artist = $currow[$colpos{artist}];
+				$date = exists($colpos{date}) ? $currow[$colpos{date}] : 'N/A';
+
+				$songdata{$artist.$song} = [$song, $artist];
+				unless($persong{$artist.$song}) {
+					$persong{$artist.$song} = [];
+				}
+				push(@{$persong{$artist.$song}}, sprintf("%s, %s %s", $chart, $date, $year));
 			}
-			push(@{$persong{$artist.$song}}, sprintf("%s, %s %s", $chart, $date, $year));
 		}
 	}
 }
-
-print Dumper %firstheaders;
 
 for $key (keys %persong) {
 	my ($song, $artist) = @{$songdata{$key}};
