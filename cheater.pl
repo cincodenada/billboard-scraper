@@ -71,10 +71,13 @@ while(<>) {
 %persong = {};
 %songdata = {};
 %headers = {};
+%linkmap = {};
 for $key (keys %rows) {
 	$chart = $key;
 	$chart =~ s/^List of //i;
 	$chart =~ s/^Number[ \-]one //i;
+	$chart = ucfirst($chart);
+	$linkmap{$chart} = $key;
 	if($chart =~ /of (\d+)/) {
 		$year = $1;
 	}
@@ -125,4 +128,10 @@ for $key (keys %persong) {
 	my ($song, $artist) = @{$songdata{$key}};
 	printf("%s\t%s\t%s\n", $artist, $song, join('; ', @{$persong{$key}}));
 }
+
+open(my $fh, '>', 'linkmap.tsv');
+for $text(keys %linkmap) {
+	printf $fh "%s\t%s\n", $text, $linkmap{$text};
+}
+close($fh);
 #print Dumper %rows;
