@@ -14,9 +14,9 @@ sub debug {
 
 while(<>) {
 	$_ = decode_entities($_);
-	if(/{{Dts\|format=\w+\|(\d+)\|(\d+)\|(\d+)}}/) {
+	if(/\{\{Dts\|format\=\w+\|(\d+)\|(\d+)\|(\d+)\}\}/) {
 		($year, $month, $day) = ($1, $2, $3);
-		s/{{Dts.*?}}/$month-$day-$year/;
+		s/\{\{Dts.*?\}\}/$month-$day-$year/;
 	}
 	s/<ref.*?>.*?<\/ref>//g;
 	s/<small>(.*?)<\/small>/(\1)/g;
