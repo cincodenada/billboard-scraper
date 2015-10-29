@@ -89,13 +89,13 @@ for $key (keys %rows) {
 	$colnum = 0;
 	$mincols = 0;
 	for $col (@header) {
-		if($col =~ /date|reached/i) {
+		if($col =~ /date|reached/i and !exists($colpos{date})) {
 			$colpos{date} = $colnum;
 			if($colnum > $mincols) { $mincols = $colnum; }
-		} elsif($col =~ /song|title|single/i) {
+		} elsif($col =~ /song|title|single/i and !exists($colpos{song})) {
 			$colpos{song} = $colnum;
 			if($colnum > $mincols) { $mincols = $colnum; }
-		} elsif($col =~ /artist/i) {
+		} elsif($col =~ /artist/i and !exists($colpos{artist})) {
 			$colpos{artist} = $colnum;
 			if($colnum > $mincols) { $mincols = $colnum; }
 		}
