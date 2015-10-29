@@ -102,16 +102,20 @@ for $key (keys %rows) {
 	if(exists($colpos{artist}) and exists($colpos{song})) {
 		for $row (@{$rows{$key}}) {
 			@currow = @{$row};
-			if(scalar(@currow) > $mincols) {
+			# Update year from decade-type charts
+			if(scalar(@currow) == 1) {
+				if($currow[0] =~ /\d{4,4}/) { $year = $1; }
+			} elsif(scalar(@currow) > $mincols) {
 				$song = $currow[$colpos{song}];
 				$artist = $currow[$colpos{artist}];
 				$date = exists($colpos{date}) ? $currow[$colpos{date}] : 'N/A';
+				unless($date =~ /\d{4,4}/) { $date .= ", $year"; }
 
 				$songdata{$artist.$song} = [$song, $artist];
 				unless($persong{$artist.$song}) {
 					$persong{$artist.$song} = [];
 				}
-				push(@{$persong{$artist.$song}}, sprintf("%s, %s %s", $chart, $date, $year));
+				push(@{$persong{$artist.$song}}, sprintf("%s, %s", $chart, $date));
 			}
 		}
 	}
@@ -119,6 +123,6 @@ for $key (keys %rows) {
 
 for $key (keys %persong) {
 	my ($song, $artist) = @{$songdata{$key}};
-	printf("%s - %s (%s)\n", $song, $artist, join('; ', @{$persong{$key}}));
+	printf("%s\t%s\t%s\n", $artist, $song, join('; ', @{$persong{$key}}));
 }
 #print Dumper %rows;
