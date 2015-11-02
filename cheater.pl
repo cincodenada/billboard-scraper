@@ -53,8 +53,8 @@ while(<>) {
 		if(scalar(@{$filteredrow}) > 0) {
 			debug "Finishing row!\n";
 			push(@{$currows}, $filteredrow);
-			$currow = [];
 		}
+		$currow = [];
 	} elsif(/^\|\}/) {
 		# End of a table
 		debug "Finishing table!\n";
