@@ -23,8 +23,9 @@ while(<>) {
 		$name = (exists $+{dname}) ? $+{dname} : "$+{fname} $+{lname}";
 		s/\{\{sortname.*?\}\}/$name/;
 	}
+	s/[↓↑]//g;
 	s/<ref.*?>.*?<\/ref>//g;
-	s/<small>(.*?)<\/small>/(\1)/g;
+	s/<small>\s+(.*?)(?:<\/small>)?/\1/g;
 	s/<ref.*?\/>//g;
 	s/<!--.*?-->//g;
 	s/<\/?br ?\/?>/ /g;
