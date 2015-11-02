@@ -19,6 +19,10 @@ while(<>) {
 		($year, $month, $day) = ($1, $2, $3);
 		s/\{\{Dts.*?\}\}/$month-$day-$year/;
 	}
+	if(/\{\{sortname\|(?<fname>.*)\|(?<lname>.*)(?:\|(?<dname>.*))?\}\}/) {
+		$name = (exists $+{dname}) ? $+{dname} : "$+{fname} $+{lname}";
+		s/\{\{sortname.*?\}\}/$name/;
+	}
 	s/<ref.*?>.*?<\/ref>//g;
 	s/<small>(.*?)<\/small>/(\1)/g;
 	s/<ref.*?\/>//g;
