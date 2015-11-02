@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 use Data::Dumper;
 use HTML::Entities;
 my $curheader;
