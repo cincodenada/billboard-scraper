@@ -107,6 +107,10 @@ for $key (keys %rows) {
 		$colnum++;
 	}
 
+	my %revcols = reverse %colpos;
+	debug join (', ', map { "$_: $revcols{$_}" } sort keys %revcols) . ' - ';
+	debug join (', ', @header) . "\n";
+
 	if(exists($colpos{artist}) and exists($colpos{song})) {
 		for $row (@{$rows{$key}}) {
 			@currow = @{$row};
