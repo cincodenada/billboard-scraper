@@ -7,6 +7,9 @@ my $currows;
 my %rows;
 my $curtitle;
 
+my $skiprows, $firstrow;
+my $lastartist;
+
 sub debug {
 	if(0) {
 		print @_;
@@ -22,6 +25,10 @@ while(<>) {
 	if(/\{\{sortname\|(?<fname>.*)\|(?<lname>.*)(?:\|(?<dname>.*))?\}\}/) {
 		$name = (exists $+{dname}) ? $+{dname} : "$+{fname} $+{lname}";
 		s/\{\{sortname.*?\}\}/$name/;
+	}
+	if(/rowspan="?(\d+)"?/) {
+		$skiprows = $1;
+		$firstrow = 1;
 	}
 	s/[↓↑]//g;
 	s/<ref.*?>.*?<\/ref>//g;
@@ -45,19 +52,25 @@ while(<>) {
 		$curtitle = $1;
 		debug "Found title: $curtitle\n";
 	} elsif(/^\|\-/) {
-		# End of a row
-		$filteredrow = [];
-		foreach $val (@{$currow}) {
-			$val =~ s/^\s+|\s+$//g;
-			$val =~ s/^"(.*)"$/\1/g;
-			$val =~ s/^'+(.*)'+$/\1/g;
-			if($val ne '') {
-				push(@{$filteredrow}, $val);
+		unless($skiprows and not $firstrow) {
+			# End of a row
+			$filteredrow = [];
+			foreach $val (@{$currow}) {
+				$val =~ s/^\s+|\s+$//g;
+				$val =~ s/^"(.*)"$/\1/g;
+				$val =~ s/^'+(.*)'+$/\1/g;
+				if($val ne '') {
+					push(@{$filteredrow}, $val);
+				}
+			}
+			if(scalar(@{$filteredrow}) > 0) {
+				debug "Finishing row!\n";
+				push(@{$currows}, $filteredrow);
 			}
 		}
-		if(scalar(@{$filteredrow}) > 0) {
-			debug "Finishing row!\n";
-			push(@{$currows}, $filteredrow);
+		if($skiprows) {
+			$skiprows--;
+			$firstrow = 0;
 		}
 		$currow = [];
 	} elsif(/^\|\}/) {
@@ -107,7 +120,7 @@ for $key (keys %rows) {
 			if($colnum > $mincols) { $mincols = $colnum; }
 		} elsif($col =~ /artist/i and !exists($colpos{artist})) {
 			$colpos{artist} = $colnum;
-			if($colnum > $mincols) { $mincols = $colnum; }
+			#if($colnum > $mincols) { $mincols = $colnum; }
 		}
 		$colnum++;
 	}
@@ -122,11 +135,17 @@ for $key (keys %rows) {
 			# Update year from decade-type charts
 			if(scalar(@currow) == 1) {
 				if($currow[0] =~ /\d{4,4}/) { $year = $1; }
-			} elsif(scalar(@currow) > $mincols) {
+			} elsif(scalar(@currow) >= $mincols) {
 				$song = $currow[$colpos{song}];
 				$artist = $currow[$colpos{artist}];
 				$date = exists($colpos{date}) ? $currow[$colpos{date}] : 'N/A';
 				unless($date =~ /\d{4,4}/) { $date .= ", $year"; }
+
+				# Adjust for if an artist has two songs in a row in the charts
+				if($artist =~ /^(\d+,)+\d+$/ or $artist eq '') {
+					$artist = $lastartist;
+				}
+				$lastartist = $artist;
 
 				$songdata{$artist.$song} = [$song, $artist];
 				unless($persong{$artist.$song}) {
