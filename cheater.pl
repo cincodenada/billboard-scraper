@@ -7,7 +7,6 @@ my $currows;
 my %rows;
 my $curtitle;
 
-my $skiprows, $firstrow;
 my $lastartist;
 
 sub debug {
@@ -25,10 +24,6 @@ while(<>) {
 	if(/\{\{sortname\|(?<fname>.*)\|(?<lname>.*)(?:\|(?<dname>.*))?\}\}/) {
 		$name = (exists $+{dname}) ? $+{dname} : "$+{fname} $+{lname}";
 		s/\{\{sortname.*?\}\}/$name/;
-	}
-	if(/rowspan="?(\d+)"?/) {
-		$skiprows = $1;
-		$firstrow = 1;
 	}
 	s/[↓↑]//g;
 	s/<ref.*?>.*?<\/ref>//g;
@@ -52,25 +47,19 @@ while(<>) {
 		$curtitle = $1;
 		debug "Found title: $curtitle\n";
 	} elsif(/^\|\-/) {
-		unless($skiprows and not $firstrow) {
-			# End of a row
-			$filteredrow = [];
-			foreach $val (@{$currow}) {
-				$val =~ s/^\s+|\s+$//g;
-				$val =~ s/^"(.*)"$/\1/g;
-				$val =~ s/^'+(.*)'+$/\1/g;
-				if($val ne '') {
-					push(@{$filteredrow}, $val);
-				}
-			}
-			if(scalar(@{$filteredrow}) > 0) {
-				debug "Finishing row!\n";
-				push(@{$currows}, $filteredrow);
+		# End of a row
+		$filteredrow = [];
+		foreach $val (@{$currow}) {
+			$val =~ s/^\s+|\s+$//g;
+			$val =~ s/^"(.*)"$/\1/g;
+			$val =~ s/^'+(.*)'+$/\1/g;
+			if($val ne '') {
+				push(@{$filteredrow}, $val);
 			}
 		}
-		if($skiprows) {
-			$skiprows--;
-			$firstrow = 0;
+		if(scalar(@{$filteredrow}) > 0) {
+			debug "Finishing row!\n";
+			push(@{$currows}, $filteredrow);
 		}
 		$currow = [];
 	} elsif(/^\|\}/) {
@@ -142,7 +131,9 @@ for $key (keys %rows) {
 				unless($date =~ /\d{4,4}/) { $date .= ", $year"; }
 
 				# Adjust for if an artist has two songs in a row in the charts
-				if($artist =~ /^(\d+,)+\d+$/ or $artist eq '') {
+				if($song =~ /^(\d+,)+\d+$/ and $artist eq '') {
+					next;
+				} elsif($artist =~ /^(\d+,)+\d+$/ or $artist eq '') {
 					$artist = $lastartist;
 				}
 				$lastartist = $artist;
