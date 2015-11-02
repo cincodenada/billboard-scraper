@@ -25,6 +25,10 @@ while(<>) {
 		$name = (exists $+{dname}) ? $+{dname} : "$+{fname} $+{lname}";
 		s/\{\{sortname.*?\}\}/$name/;
 	}
+	if(/\{\{Abbr\|(?<abbrev>.*)\|(?<full>.*)\}\}/) {
+		$rep = $+{abbrev};
+		s/\{\{Abbr.*?\}\}/$rep/;
+	}
 	s/[↓↑]//g;
 	s/<ref.*?>.*?<\/ref>//g;
 	s/<small>\s+(.*?)(?:<\/small>)?/\1/g;
