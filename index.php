@@ -1,5 +1,6 @@
 <html>
   <head>
+    <meta charset="utf-8" />
     <title>Most of the #1 Billboard Hits I could find on Wikipedia</title>
     <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.4.js"></script>
     <link rel="stylesheet" href="//cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css"/>
