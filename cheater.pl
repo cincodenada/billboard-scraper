@@ -19,23 +19,23 @@ $colnum = 0;
 @spanvalues = ();
 while(<>) {
 	$_ = decode_entities($_);
-	if(/\{\{Dts\|format\=\w+\|(\d+)\|(\d+)\|(\d+)\}\}/) {
+	if(/\{\{dts\|format\=\w+\|(\d+)\|(\d+)\|(\d+)\}\}/i) {
 		($year, $month, $day) = ($1, $2, $3);
-		s/\{\{Dts.*?\}\}/$month-$day-$year/;
+		s/\{\{dts.*?\}\}/$month-$day-$year/i;
 	}
-	if(/\{\{sortname\|(?<fname>.*)\|(?<lname>.*)(?:\|(?<dname>.*))?\}\}/) {
+	if(/\{\{sortname\|(?<fname>.*)\|(?<lname>.*)(?:\|(?<dname>.*))?\}\}/i) {
 		$name = (exists $+{dname}) ? $+{dname} : "$+{fname} $+{lname}";
-		s/\{\{sortname.*?\}\}/$name/;
+		s/\{\{sortname.*?\}\}/$name/i;
 	}
-	if(/\{\{sort\|(?<sort>.*?)\|(?<display>.*)\}\}/) {
+	if(/\{\{sort\|(?<sort>.*?)\|(?<display>.*)\}\}/i) {
 		$name = $+{display};
-		s/\{\{sort.*?\}\}/$name/;
+		s/\{\{sort.*?\}\}/$name/i;
 	}
-	if(/\{\{Abbr\|(?<abbrev>.*)\|(?<full>.*)\}\}/) {
+	if(/\{\{abbr\|(?<abbrev>.*)\|(?<full>.*)\}\}/i) {
 		$rep = $+{abbrev};
-		s/\{\{Abbr.*?\}\}/$rep/;
+		s/\{\{abbr.*?\}\}/$rep/i;
 	}
-	if(/rowspan="?(\d+)"?/) {
+	if(/rowspan="?(\d+)"?/i) {
 		# Set rowspan for cur row
 		if($1 > 1) {
 			$prerowspans[$colnum] = $1;
