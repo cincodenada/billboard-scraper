@@ -18,6 +18,7 @@ $colnum = 0;
 @prerowspans = ();
 @spanvalues = ();
 @prespanvalues = ();
+my $lastrow;
 while(<>) {
 	$_ = decode_entities($_);
 	if(/\{\{dts\|format\=\w+\|(\d+)\|(\d+)\|(\d+)\}\}/i) {
@@ -64,6 +65,8 @@ while(<>) {
 		$curtitle = $1;
 		debug "Found title: $curtitle\n";
 	} elsif(/^\|\-/) {
+		# If this is an erroneous totally blank row, skip it
+		if($lastrow =~ /^\|\-/) { next; }
 		# End of a row
 		$filteredrow = [];
 		# Adjust the columns (and prerowspans)
@@ -126,6 +129,8 @@ while(<>) {
 		}
 		$colnum++;
 	}
+
+	$lastrow = $_;
 }
 
 %persong = {};
