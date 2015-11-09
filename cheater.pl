@@ -17,6 +17,7 @@ $colnum = 0;
 @rowspans = ();
 @prerowspans = ();
 @spanvalues = ();
+@prespanvalues = ();
 while(<>) {
 	$_ = decode_entities($_);
 	if(/\{\{dts\|format\=\w+\|(\d+)\|(\d+)\|(\d+)\}\}/i) {
@@ -71,6 +72,7 @@ while(<>) {
 				$rowspans[$colnum]--;
 				splice @{$currow}, $colnum, 0, $spanvalues[$colnum];
 				splice @prerowspans, $colnum, 0, 0;
+				splice @prespanvalues, $colnum, 0, undef;
 				unless($rowspans[$colnum]) {
 					undef($spanvalues[$colnum])
 				}
@@ -80,6 +82,7 @@ while(<>) {
 		foreach $colnum (keys @prerowspans) {
 			if($prerowspans[$colnum]) {
 				$rowspans[$colnum] = $prerowspans[$colnum] - 1;
+				$spanvalues[$colnum] = $prespanvalues[$colnum];
 			}
 		}
 
@@ -108,6 +111,7 @@ while(<>) {
 		$colnum = 0;
 		undef(@prerowspans);
 		undef(@rowspans);
+		undef(@prespanvalues);
 		undef(@spanvalues);
 	} elsif($in_table and /^[\|\!](.*(?:[\|\!]{2,2}.*)+)$/) {
 		debug "Found single-row row\n";
@@ -117,8 +121,8 @@ while(<>) {
 		# Regular col
 		debug "Found individual col\n";
 		push(@{$currow}, $1);
-		if($prerowspans[$colnum] and not $spanvalues[$colnum]) {
-			$spanvalues[$colnum] = $1;
+		if($prerowspans[$colnum] and not $prespanvalues[$colnum]) {
+			$prespanvalues[$colnum] = $1;
 		}
 		$colnum++;
 	}
