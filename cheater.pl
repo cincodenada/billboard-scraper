@@ -7,14 +7,16 @@ my $currows;
 my %rows;
 my $curtitle;
 
-my $lastartist;
-
 sub debug {
 	if(0) {
 		print @_;
 	}
 }
 
+$colnum = 0;
+@rowspans = ();
+@prerowspans = ();
+@spanvalues = ();
 while(<>) {
 	$_ = decode_entities($_);
 	if(/\{\{Dts\|format\=\w+\|(\d+)\|(\d+)\|(\d+)\}\}/) {
@@ -28,6 +30,12 @@ while(<>) {
 	if(/\{\{Abbr\|(?<abbrev>.*)\|(?<full>.*)\}\}/) {
 		$rep = $+{abbrev};
 		s/\{\{Abbr.*?\}\}/$rep/;
+	}
+	if(/rowspan="?(\d+)"?/) {
+		# Set rowspan for cur row
+		if($1 > 1) {
+			$prerowspans[$colnum] = $1;
+		}
 	}
 	s/[↓↑]//g;
 	s/<ref.*?>.*?<\/ref>//g;
@@ -53,19 +61,38 @@ while(<>) {
 	} elsif(/^\|\-/) {
 		# End of a row
 		$filteredrow = [];
+		# Adjust the columns (and prerowspans)
+		foreach $colnum (keys @rowspans) {
+			if($rowspans[$colnum]) {
+				$rowspans[$colnum]--;
+				splice @{$currow}, $colnum, 0, $spanvalues[$colnum];
+				splice @prerowspans, $colnum, 0, 0;
+				unless($rowspans[$colnum]) {
+					undef($spanvalues[$colnum])
+				}
+			}
+		}
+		# Add any now-adjusted prerowspans
+		foreach $colnum (keys @prerowspans) {
+			if($prerowspans[$colnum]) {
+				$rowspans[$colnum] = $prerowspans[$colnum] - 1;
+			}
+		}
+
 		foreach $val (@{$currow}) {
 			$val =~ s/^\s+|\s+$//g;
 			$val =~ s/^"(.*)"$/\1/g;
 			$val =~ s/^'+(.*)'+$/\1/g;
-			if($val ne '') {
-				push(@{$filteredrow}, $val);
-			}
+			push(@{$filteredrow}, $val);
 		}
 		if(scalar(@{$filteredrow}) > 0) {
 			debug "Finishing row!\n";
 			push(@{$currows}, $filteredrow);
+			debug join("\t", @{$filteredrow}) . "\n";
 		}
 		$currow = [];
+		$colnum = 0;
+		undef(@prerowspans);
 	} elsif(/^\|\}/) {
 		# End of a table
 		debug "Finishing table!\n";
@@ -74,6 +101,10 @@ while(<>) {
 		$currow = [];
 		$currows = [];
 		$curheader = [];
+		$colnum = 0;
+		undef(@prerowspans);
+		undef(@rowspans);
+		undef(@spanvalues);
 	} elsif($in_table and /^[\|\!](.*(?:[\|\!]{2,2}.*)+)$/) {
 		debug "Found single-row row\n";
 		@{$currow} = split(/[\|\!]{2,2}/, $1);
@@ -81,6 +112,10 @@ while(<>) {
 		# Regular col
 		debug "Found individual col\n";
 		push(@{$currow}, $1);
+		if($prerowspans[$colnum] and not $spanvalues[$colnum]) {
+			$spanvalues[$colnum] = $1;
+		}
+		$colnum++;
 	}
 }
 
@@ -113,7 +148,7 @@ for $key (keys %rows) {
 			if($colnum > $mincols) { $mincols = $colnum; }
 		} elsif($col =~ /artist/i and !exists($colpos{artist})) {
 			$colpos{artist} = $colnum;
-			#if($colnum > $mincols) { $mincols = $colnum; }
+			if($colnum > $mincols) { $mincols = $colnum; }
 		}
 		$colnum++;
 	}
@@ -133,14 +168,6 @@ for $key (keys %rows) {
 				$artist = $currow[$colpos{artist}];
 				$date = exists($colpos{date}) ? $currow[$colpos{date}] : 'N/A';
 				unless($date =~ /\d{4,4}/) { $date .= ", $year"; }
-
-				# Adjust for if an artist has two songs in a row in the charts
-				if($song =~ /^(\d+,)+\d+$/ and $artist eq '') {
-					next;
-				} elsif($artist =~ /^(\d+,)+\d+$/ or $artist eq '') {
-					$artist = $lastartist;
-				}
-				$lastartist = $artist;
 
 				$songdata{$artist.$song} = [$song, $artist];
 				unless($persong{$artist.$song}) {
