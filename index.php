@@ -9,6 +9,9 @@
   $fh = fopen('songs.tsv','r');
   $songs = array();
   while($row = fgetcsv($fh, 10000, "\t", "\0")) {
+    if(empty($row[0]) && empty($row[1]) && empty($row[2])) {
+      continue;
+    }
     // Explode out the sources
     $sources = array();
     foreach(explode('; ', $row[2]) as $sourcedate) {
