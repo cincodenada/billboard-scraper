@@ -116,9 +116,9 @@ while(<>) {
 		undef(@rowspans);
 		undef(@prespanvalues);
 		undef(@spanvalues);
-	} elsif($in_table and /^[\|\!](.*(?:[\|\!]{2,2}.*)+)$/) {
+	} elsif($in_table and /^([\|\!])(.*(?:\g1{2,2}.*)+)$/) {
 		debug "Found single-row row\n";
-		@cols = split(/[\|\!]{2,2}/, $1);
+		@cols = split(/[\|\!]{2,2}/, $2);
 		push(@{$currow}, @cols);
 	} elsif($in_table and /^[\|\!](?:.*\|)?(.*)$/) {
 		# Regular col
