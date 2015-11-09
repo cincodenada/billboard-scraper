@@ -48,8 +48,8 @@
         width: 500px;
       }
 
-      .dataTables_filter { float: left; }
-      .dataTables_length { float: right; }
+      .dataTables_wrapper .dataTables_filter { float: left; }
+      .dataTables_wrapper .dataTables_length { float: right; }
     </style>
   </head>
   <body>
