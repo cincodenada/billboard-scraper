@@ -185,9 +185,11 @@ for $key (keys %rows) {
 
 				$songdata{$artist.$song} = [$song, $artist];
 				unless($persong{$artist.$song}) {
-					$persong{$artist.$song} = [];
+					$persong{$artist.$song} = {};
 				}
-				push(@{$persong{$artist.$song}}, sprintf("%s, %s", $chart, $date));
+				unless(exists($persong{$artist.$song}->{$chart})) {
+					$persong{$artist.$song}->{$chart} = $date
+				}
 			}
 		}
 	}
@@ -195,7 +197,9 @@ for $key (keys %rows) {
 
 for $key (keys %persong) {
 	my ($song, $artist) = @{$songdata{$key}};
-	printf("%s\t%s\t%s\n", $artist, $song, join('; ', @{$persong{$key}}));
+	my %charthash = %{$persong{$key}};
+	my @chartdate = map { $_ . ", " . $charthash{$_} } keys %charthash;
+	printf("%s\t%s\t%s\n", $artist, $song, join('; ', @chartdate));
 }
 
 open(my $fh, '>', 'linkmap.tsv');
