@@ -47,6 +47,9 @@
         padding: 5px;
         width: 500px;
       }
+
+      .dataTables_filter { float: left; }
+      .dataTables_length { float: right; }
     </style>
   </head>
   <body>
