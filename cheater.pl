@@ -37,7 +37,7 @@ while(<>) {
 		$rep = $+{abbrev};
 		s/\{\{abbr.*?\}\}/$rep/i;
 	}
-	if(/rowspan="?(\d+)"?/i) {
+	if(/rowspan= ?"?(\d+)"?/i) {
 		# Set rowspan for cur row
 		if($1 > 1) {
 			$prerowspans[$colnum] = $1;
