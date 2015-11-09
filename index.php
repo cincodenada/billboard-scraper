@@ -1,34 +1,3 @@
-<pre style="display: none">
-<?php
-  $fh = fopen('linkmap.tsv','r');
-  $links = array();
-  while($row = fgetcsv($fh, 10000, "\t")) {
-    $links[$row[0]] = $row[1];
-  }
-
-  $fh = fopen('songs.tsv','r');
-  $songs = array();
-  while($row = fgetcsv($fh, 10000, "\t", "\0")) {
-    if(empty($row[0]) && empty($row[1]) && empty($row[2])) {
-      continue;
-    }
-    // Explode out the sources
-    $sources = array();
-    foreach(explode('; ', $row[2]) as $sourcedate) {
-      list($source, $date) = explode(', ', $sourcedate, 2);
-      if(empty($date)) { var_dump($row); print "<$sourcedate>\n"; }
-      $sources[] = array(
-        'source' => $source,
-        'date' => $date,
-        'link' => $links[$source],
-      );
-    }
-    $row[2] = $sources;
-
-    $songs[] = $row;
-  }
-?>
-</pre>
 <html>
   <head>
     <title>Most of the #1 Billboard Hits I could find on Wikipedia</title>
@@ -53,6 +22,37 @@
     </style>
   </head>
   <body>
+    <pre style="display: none">
+    <?php
+      $fh = fopen('linkmap.tsv','r');
+      $links = array();
+      while($row = fgetcsv($fh, 10000, "\t")) {
+        $links[$row[0]] = $row[1];
+      }
+
+      $fh = fopen('songs.tsv','r');
+      $songs = array();
+      while($row = fgetcsv($fh, 10000, "\t", "\0")) {
+        if(empty($row[0]) && empty($row[1]) && empty($row[2])) {
+          continue;
+        }
+        // Explode out the sources
+        $sources = array();
+        foreach(explode('; ', $row[2]) as $sourcedate) {
+          list($source, $date) = explode(', ', $sourcedate, 2);
+          if(empty($date)) { var_dump($row); print "<$sourcedate>\n"; }
+          $sources[] = array(
+            'source' => $source,
+            'date' => $date,
+            'link' => $links[$source],
+          );
+        }
+        $row[2] = $sources;
+
+        $songs[] = $row;
+      }
+    ?>
+    </pre>
     <a href="songs.tsv">Download the source TSV for use in Excel, etc</a><br/>
     <table>
       <thead>
