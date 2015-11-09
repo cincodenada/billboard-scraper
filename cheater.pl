@@ -183,6 +183,9 @@ for $key (keys %rows) {
 				$date = exists($colpos{date}) ? $currow[$colpos{date}] : 'N/A';
 				unless($date =~ /\d{4,4}/) { $date .= ", $year"; }
 
+				# Skip "NO CHART" entries
+				if($song eq 'NO CHART' and $artist eq '') { next; }
+
 				$songdata{$artist.$song} = [$song, $artist];
 				unless($persong{$artist.$song}) {
 					$persong{$artist.$song} = {};
