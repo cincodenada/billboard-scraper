@@ -4,6 +4,7 @@
     <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.4.js"></script>
     <link rel="stylesheet" href="//cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css"/>
     <link rel="stylesheet" href="//cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/>
     <script type="text/javascript" src="//cdn.datatables.net/1.10.9/js/jquery.dataTables.min.js"></script>
     <style>
       .popup {
@@ -53,34 +54,73 @@
       }
     ?>
     </pre>
-    <a href="songs.tsv">Download the source TSV for use in Excel, etc</a><br/>
-    <table>
-      <thead>
-        <tr>
-          <th>Artist</th>
-          <th>Song</th>
-          <th>Source chart(s)</th>
-      </thead>
-      <tbody>
-        <?php foreach($songs as $row): ?>
-        <tr>
-          <td><?=$row[0]?></td>
-          <td><?=$row[1]?></td>
-          <td style="position: relative">
-            <a href="" class="refcount">[<?=count($row[2])?>]</a>
-            <div class="popup">
-              <?php foreach($row[2] as $source): ?>
-              <a href="http://en.wikipedia.org/wiki/<?=$source['link']?>">
-                <?=$source['source']?></a>
-              <?=$source['date']?>
-              <br/>
-              <?php endforeach ?>
+    <header class="navbar navbar-static-top navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand">
+                    Most of the #1 Billboard Hits I could find on Wikipedia 
+                </a>
             </div>
-          </td>
-        </tr>
-        <?php endforeach ?>
-      </tbody>
-    </table>
+            <nav id="bs-navbar" class="collapse navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a class="btn" href="songs.tsv"><i class="glyphicon glyphicon-download-alt"></i> Download the source TSV for use in Excel, etc</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <p>
+                            <b>Quick start:</b> No guarantees, but this should be a good place to start.
+                            Search with the box on the left that should appear shortly,
+                            hover over the number on the right to see where they came from.
+                        </p>
+                        <p>I parsed through all the Billboard charts I could find on Wikipedia, and the data should be pretty clean now.  There are some duplicates because of
+                        different spellings (e.g. "'NSync" vs "'N Sync" or "Black Eyed Peas" vs "The Black Eyed Peas"), but those shouldn't pose too much of a problem
+                        for the purposes of looking things up.</p> 
+                        <p>I do not guarantee that all songs here are actually #1 Billboard Hits, and certainly not all the #1 Billboard Hits are here.  I may have picked
+                        up some erroneous songs here or there, there were a lot of songs (over 7,000 or so).  Fortunately, if you hover over the number on the far right,
+                        it will tell you what chart (or charts) I got that song from, with a link straight to the Wikipedia page, so you can double-check there to confirm.</p>
+                        <p>Have fun!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Artist</th>
+                      <th>Song</th>
+                      <th>Source chart(s)</th>
+                  </thead>
+                  <tbody>
+                    <?php foreach($songs as $row): ?>
+                    <tr>
+                      <td><?=$row[0]?></td>
+                      <td><?=$row[1]?></td>
+                      <td style="position: relative">
+                        <a href="" class="refcount">[<?=count($row[2])?>]</a>
+                        <div class="popup">
+                          <?php foreach($row[2] as $source): ?>
+                          <a href="http://en.wikipedia.org/wiki/<?=$source['link']?>">
+                            <?=$source['source']?></a>
+                          <?=$source['date']?>
+                          <br/>
+                          <?php endforeach ?>
+                        </div>
+                      </td>
+                    </tr>
+                    <?php endforeach ?>
+                  </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
     <script type="text/javascript">
       $('table').DataTable({
         dom: 'flrtip',
