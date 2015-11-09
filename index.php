@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="//cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css"/>
     <link rel="stylesheet" href="//cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
     <script type="text/javascript" src="//cdn.datatables.net/1.10.9/js/jquery.dataTables.min.js"></script>
     <style>
       .popup {
@@ -65,7 +66,10 @@
             <nav id="bs-navbar" class="collapse navbar-collapse">
                 <ul class="nav navbar-nav navbar-right">
                     <li>
-                        <a class="btn" href="songs.tsv"><i class="glyphicon glyphicon-download-alt"></i> Download the source TSV for use in Excel, etc</a>
+                        <a class="btn" href="https://github.com/cincodenada/billboard-scraper"><i class="fa fa-github"></i> GitHub</a>
+                    </li>
+                    <li>
+                        <a class="btn" href="songs.tsv"><i class="fa fa-download"></i> Download the source TSV for use in Excel, etc</a>
                     </li>
                 </ul>
             </nav>
@@ -87,7 +91,7 @@
                         <p>I do not guarantee that all songs here are actually #1 Billboard Hits, and certainly not all the #1 Billboard Hits are here.  I may have picked
                         up some erroneous songs here or there, there were a lot of songs (over 7,000 or so).  Fortunately, if you hover over the number on the far right,
                         it will tell you what chart (or charts) I got that song from, with a link straight to the Wikipedia page, so you can double-check there to confirm.</p>
-                        <p>Have fun!</p>
+                        <p>Have fun, and good luck!</p>
                     </div>
                 </div>
             </div>
