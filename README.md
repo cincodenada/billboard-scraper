@@ -15,6 +15,10 @@ formatting quirks.  And I'm in way too deep.
 
 It was designed for and tested on Billboard charts, so YMMV with anything else.
 
+I've also included a basic PHP page that will display the songs in a nice,
+sortable/searchable table.  DataTables is probably a bit heavy for my needs,
+but it's what I know, and it works great.
+
 ## Note about this repo
 
 The history before Nov 1, 2015 is reconstructed from git undo history.
